@@ -1,5 +1,5 @@
 locals {
-  data_lake_bucket = "ticketmasters_data_lake"
+  data_lake_bucket = "ticketmaster_data_lake"
 }
 
 variable "project" {
