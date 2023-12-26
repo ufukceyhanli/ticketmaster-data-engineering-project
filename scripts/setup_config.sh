@@ -1,0 +1,5 @@
+#!/bin/bash
+export GCP_PROJECT_ID=ticketmaster-data-engineering
+export GCP_GCS_BUCKET=ticketmasters_data_lake_ticketmaster-data-engineering
+export TMP_BUCKET=ticketmasters_data_lake_tmp_ticketmaster-data-engineering
+export BIGQUERY_DATASET=ticketmaster_prod
