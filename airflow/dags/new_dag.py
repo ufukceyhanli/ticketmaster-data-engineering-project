@@ -1,44 +1,61 @@
-import urllib.request
-import pandas as pd
-import json
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
-from airflow.operators.bash import BashOperator
-import os
+import pandas as pd
+import json
+import urllib.request
 
-def extract_past_data(period, stocks, **kwargs):
-    url = "https://app.ticketmaster.com/discovery/v2/events.json?countryCode=NL&apikey=z8N0z01P5zAe4W7APxFl5wUvn5UzvJ8G&size=200&startDateTime=2024-02-01T14:00:00Z&endDateTime=2024-02-05T14:00:00Z"
+# Constants
+API_URL = "https://app.ticketmaster.com/discovery/v2/events.json"
+API_KEY = "z8N0z01P5zAe4W7APxFl5wUvn5UzvJ8G"
+LOCAL_DATA_PATH = "/opt/airflow/data/historical_data.csv.gz"
+
+default_args = {
+    'owner': 'airflow',
+    'start_date': datetime(2023, 4, 22),
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
+    'catchup': False,
+    'max_active_runs': 1,
+}
+
+dag = DAG(
+    'new_dag',
+    description='New DAG',
+    schedule_interval='@once',
+    default_args=default_args,
+    catchup=False,
+    max_active_runs=1,
+)
+
+def extract_past_data(COUNTRY_CODE, START_DATE, END_DATE, **kwargs):
+    url = f"{API_URL}?countryCode={COUNTRY_CODE}&apikey={API_KEY}&size=200&startDateTime={START_DATE}&endDateTime={END_DATE}"
     req = urllib.request.Request(url)
     req.get_method = lambda: 'GET'
-    response = urllib.request.urlopen(req)
     
-    if response.getcode() == 200:
-        data = json.loads(response.read())
-
-        # Assuming the relevant data is in the 'payload' key, adjust this according to the actual structure of the API response
-        events_data = data["_embedded"]["events"]
-
-        # Convert the data into a DataFrame
-        past_df = pd.DataFrame(events_data)
-    
-    file_name = "historical_data"
-    local_file_path = f"/opt/airflow/data/{file_name}.csv.gz"
-    
-    past_df.to_csv(local_file_path, index=True, compression="gzip")
-
-dag = DAG('new_dag', description='new dag', schedule_interval='@once',
-          start_date=datetime(2023, 4, 22), catchup=False, max_active_runs=1)
+    try:
+        with urllib.request.urlopen(req) as response:
+            if response.getcode() == 200:
+                data = json.loads(response.read())
+                events_data = data.get("_embedded", {}).get("events", [])
+                past_df = pd.DataFrame(events_data)
+                past_df.to_csv(LOCAL_DATA_PATH, index=True, compression="gzip")
+                return True
+    except Exception as e:
+        # Add appropriate error handling (logging, notifications, etc.)
+        raise
 
 extract_past_data_to_local_task = PythonOperator(
-    task_id=f"extract_past_data_to_local_task",
+    task_id='extract_past_data_to_local_task',
     python_callable=extract_past_data,
     provide_context=True,
     dag=dag,
     op_kwargs={
-        "period": 60,
-        "stocks": ['AAPL', 'MSFT']
+        'COUNTRY_CODE': "NL",
+        'START_DATE': "2024-02-01T14:00:00Z",
+        'END_DATE' : "2024-02-05T14:00:00Z"
     }
 )
 
-extract_past_data_to_local_task
+# Define task dependencies explicitly
+extract_past_data_to_local_task  # No downstream tasks for now

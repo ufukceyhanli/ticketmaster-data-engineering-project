@@ -1,8 +1,10 @@
 .venv
-/data
-
-# # Byte-compiled / optimized / DLL files
-# __pycache__/
+/airflow/data
+/airflow/logs
+/airflow/plugins
+__pycache__/
+/terraform/.*
+/terraform/*state*
 # *.py[cod]
 # *$py.class
 
