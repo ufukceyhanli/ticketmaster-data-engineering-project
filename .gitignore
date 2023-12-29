@@ -2,7 +2,7 @@
 /airflow/data
 /airflow/logs
 /airflow/plugins
-/airflow/.env
+.env
 __pycache__/
 /terraform/.*
 /terraform/*state*
