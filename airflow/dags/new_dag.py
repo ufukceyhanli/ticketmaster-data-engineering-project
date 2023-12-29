@@ -4,11 +4,11 @@ from airflow.operators.python_operator import PythonOperator
 import pandas as pd
 import json
 import urllib.request
-import os
+from airflow.models import Variable
 
 # Constants
 API_URL = "https://app.ticketmaster.com/discovery/v2/events.json"
-API_KEY = os.environ.get("TICKETMASTER_API_KEY_ENV_VARIABLE")
+API_KEY = Variable.get("TICKETMASTER_API_KEY")
 LOCAL_DATA_PATH = "/opt/airflow/data/historical_data.csv.gz"
 
 default_args = {
