@@ -62,6 +62,7 @@ x-airflow-common:
     GCP_GCS_BUCKET: ${GCP_GCS_BUCKET}
     BIGQUERY_DATASET: ${BIGQUERY_DATASET}
     TMP_BUCKET: ${TMP_BUCKET}
+    TICKETMASTER_API_KEY: ${TICKETMASTER_API_KEY}
 
   volumes:
     - ./dags:/opt/airflow/dags

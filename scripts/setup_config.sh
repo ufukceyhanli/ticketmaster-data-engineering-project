@@ -3,3 +3,4 @@ export GCP_PROJECT_ID=ticketmaster-data-engineering
 export GCP_GCS_BUCKET=ticketmaster_data_lake_ticketmaster-data-engineering
 export TMP_BUCKET=ticketmaster_data_lake_tmp_ticketmaster-data-engineering
 export BIGQUERY_DATASET=ticketmaster_prod
+export TICKETMASTER_API_KEY=z8N0z01P5zAe4W7APxFl5wUvn5UzvJ8G
